@@ -1,0 +1,13 @@
+{
+  "name": "ff-event-scraper",
+  "version": "1.0.0",
+  "description": "Scrapes Free Fire event data and sends it to Google Sheets.",
+  "main": "scraper.js",
+  "scripts": {
+    "start": "node scraper.js"
+  },
+  "dependencies": {
+    "puppeteer": "^24.1.0",
+    "axios": "^1.7.9"
+  }
+}
