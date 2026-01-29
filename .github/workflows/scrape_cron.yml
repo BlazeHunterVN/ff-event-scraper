@@ -2,8 +2,8 @@ name: Latest Events Scraper
 
 on:
   schedule:
-    - cron: '*/30 * * * *' # Chạy mỗi 30 phút
-  workflow_dispatch: # Cho phép chạy thủ công
+    - cron: '*/30 * * * *'
+  workflow_dispatch:
 
 jobs:
   scrape:
@@ -18,18 +18,17 @@ jobs:
           node-version: '18'
 
       - name: Install Dependencies
-        working-directory: ./BOT
+        # Đã xóa working-directory
         run: npm install
 
       - name: Run Scraper
-        working-directory: ./BOT
+        # Đã xóa working-directory
         env:
           GOOGLE_SCRIPT_URL: ${{ secrets.GOOGLE_SCRIPT_URL }}
           SINGLE_RUN: true
         run: npm start
 
       - name: Commit History
-        working-directory: ./BOT
         run: |
           git config --global user.name 'GitHub Action'
           git config --global user.email 'action@github.com'
