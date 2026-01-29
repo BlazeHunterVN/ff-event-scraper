@@ -5,6 +5,10 @@ on:
     - cron: '*/30 * * * *'
   workflow_dispatch:
 
+# QUAN TRỌNG: Cấp quyền ghi để fix lỗi 128
+permissions:
+  contents: write
+
 jobs:
   scrape:
     runs-on: ubuntu-latest
@@ -18,11 +22,9 @@ jobs:
           node-version: '18'
 
       - name: Install Dependencies
-        # Đã xóa working-directory
         run: npm install
 
       - name: Run Scraper
-        # Đã xóa working-directory
         env:
           GOOGLE_SCRIPT_URL: ${{ secrets.GOOGLE_SCRIPT_URL }}
           SINGLE_RUN: true
@@ -32,5 +34,9 @@ jobs:
         run: |
           git config --global user.name 'GitHub Action'
           git config --global user.email 'action@github.com'
-          git add history.json
-          git diff --quiet && git diff --staged --quiet || (git commit -m "Update history event log" && git push)
+          if [ -f "history.json" ]; then
+            git add history.json
+            git diff --quiet && git diff --staged --quiet || (git commit -m "Update history event log" && git push)
+          else
+            echo "No history.json found but job finished."
+          fi
