@@ -1,0 +1,37 @@
+name: Latest Events Scraper
+
+on:
+  schedule:
+    - cron: '*/30 * * * *' # Chạy mỗi 30 phút
+  workflow_dispatch: # Cho phép chạy thủ công
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Setup Node
+        uses: actions/setup-node@v2
+        with:
+          node-version: '18'
+
+      - name: Install Dependencies
+        working-directory: ./BOT
+        run: npm install
+
+      - name: Run Scraper
+        working-directory: ./BOT
+        env:
+          GOOGLE_SCRIPT_URL: ${{ secrets.GOOGLE_SCRIPT_URL }}
+          SINGLE_RUN: true
+        run: npm start
+
+      - name: Commit History
+        working-directory: ./BOT
+        run: |
+          git config --global user.name 'GitHub Action'
+          git config --global user.email 'action@github.com'
+          git add history.json
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Update history event log" && git push)
