@@ -20,7 +20,7 @@ const REGIONS = [
 ];
 
 // 3. How often to check for LOCAL runs (in minutes)
-const CHECK_INTERVAL_MINUTES = 30;
+const CHECK_INTERVAL_MINUTES = 5;
 
 const HISTORY_FILE = path.join(__dirname, 'history.json');
 
