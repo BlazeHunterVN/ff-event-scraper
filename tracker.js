@@ -27,6 +27,10 @@ function checkForUpdates() {
 
     if (newEvents.length > 0) {
         sendDataToSheet(newEvents);
+    } else {
+        console.log('No new events found. All visible events have already been sent.');
+        // Optional: Alert the user so they know it worked but just didn't have anything new
+        // alert('No new events to send (All duplicates). Clear Local Storage to force resend.');
     }
 }
 
