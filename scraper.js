@@ -3,9 +3,11 @@ const axios = require('axios');
 const fs = require('fs');
 const path = require('path');
 
+const { GOOGLE_SCRIPT_URL } = require('./config');
+
 // --- CONFIGURATION ---
-// 1. Enter your Google Apps Script Web App URL here OR use Environment Variable
-const GOOGLE_SCRIPT_URL = process.env.GOOGLE_SCRIPT_URL || 'REPLACE_WITH_YOUR_WEB_APP_URL';
+// The URL is now loaded from config.js
+
 
 // 2. List of Regions and their URLs
 const REGIONS = [
@@ -28,8 +30,9 @@ async function runScraper() {
     console.log(`\n[${new Date().toISOString()}] === STARTING SCRAPE JOB ===`);
 
     // Check if configuration is set
-    if (GOOGLE_SCRIPT_URL.includes('REPLACE_WITH')) {
-        console.error('ERROR: You must set the GOOGLE_SCRIPT_URL in scraper.js or use a GitHub Secret.');
+    if (!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL.includes('REPLACE_WITH')) {
+        console.error('\n[!!!] ERROR: Google Apps Script URL is missing.');
+        console.error(' >> Please open "BOT/config.js" and paste your Web App URL there.');
         return;
     }
 
@@ -152,9 +155,20 @@ function updateHistory(newEvents) {
 
 async function sendToSheet(data) {
     try {
-        await axios.post(GOOGLE_SCRIPT_URL, data);
+        const response = await axios.post(GOOGLE_SCRIPT_URL, data);
+        if (response.data && response.data.result === 'success') {
+            console.log(`  > [SUCCESS] Sent ${data.length} events to Sheet. (New total rows: ${response.data.count})`);
+        } else {
+            console.warn('  > [WARNING] Google Sheet returned unexpected response:', response.data);
+        }
     } catch (error) {
-        console.error('  > Error sending to Google Sheet:', error.message);
+        console.error('  > [ERROR] Failed to send to Google Sheet:');
+        if (error.response) {
+            console.error(`    Status: ${error.response.status}`);
+            console.error(`    Data: ${JSON.stringify(error.response.data)}`);
+        } else {
+            console.error(`    Message: ${error.message}`);
+        }
     }
 }
 

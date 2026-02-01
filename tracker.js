@@ -5,12 +5,12 @@
 
 // CONFIGURATION
 // REPLACE THIS WITH YOUR DEPLOYED GOOGLE APPS SCRIPT WEB APP URL
-const GOOGLE_SCRIPT_URL = 'REPLACE_WITH_YOUR_WEB_APP_URL'; 
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzWeK_xlggk5Yk8NJzE_xKHNSO5defPD-p0zvjA70Ka/exec';
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     console.log('Tracker initialized...');
-    
-    if (GOOGLE_SCRIPT_URL === 'REPLACE_WITH_YOUR_WEB_APP_URL') {
+
+    if (GOOGLE_SCRIPT_URL === 'REPLACE_WITH_YOUR_WEB_APP_URL' || !GOOGLE_SCRIPT_URL.includes('/exec')) {
         console.warn('Please update the GOOGLE_SCRIPT_URL in tracker.js with your actual Web App URL.');
         // Don't return yet, let the code run so we can see what it WOULD extract
     }
@@ -44,7 +44,7 @@ function extractEvents(region) {
         try {
             const titleEl = card.querySelector('.title');
             const hiddenDetails = card.querySelector('.event-details');
-            
+
             if (!titleEl || !hiddenDetails) return;
 
             const title = titleEl.innerText.trim();
@@ -95,7 +95,7 @@ function filterNewEvents(events) {
 }
 
 function sendDataToSheet(events) {
-    if (GOOGLE_SCRIPT_URL === 'REPLACE_WITH_YOUR_WEB_APP_URL') {
+    if (GOOGLE_SCRIPT_URL.includes('REPLACE_WITH')) {
         alert('Data extracted but not sent. Please set the GOOGLE_SCRIPT_URL in tracker.js');
         console.log('Data to send:', events);
         return;
@@ -109,15 +109,15 @@ function sendDataToSheet(events) {
         },
         body: JSON.stringify(events)
     })
-    .then(() => {
-        console.log('Data sent successfully!');
-        // Update local storage so we don't send these again
-        const sentEvents = JSON.parse(localStorage.getItem('sentEvents') || '[]');
-        events.forEach(e => sentEvents.push(e.id));
-        localStorage.setItem('sentEvents', JSON.stringify(sentEvents));
-        alert(`Sent ${events.length} new events to Google Sheet!`);
-    })
-    .catch(error => {
-        console.error('Error sending data:', error);
-    });
+        .then(() => {
+            console.log('Data sent successfully!');
+            // Update local storage so we don't send these again
+            const sentEvents = JSON.parse(localStorage.getItem('sentEvents') || '[]');
+            events.forEach(e => sentEvents.push(e.id));
+            localStorage.setItem('sentEvents', JSON.stringify(sentEvents));
+            alert(`Sent ${events.length} new events to Google Sheet!`);
+        })
+        .catch(error => {
+            console.error('Error sending data:', error);
+        });
 }
